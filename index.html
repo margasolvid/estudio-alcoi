@@ -28,7 +28,7 @@
 html,body{height:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 button,input,select{font:inherit;color:inherit}
-header{display:flex;align-items:center;gap:16px;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--panel)}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--panel)}
 header h1{font-size:17px;margin:0;font-weight:650;letter-spacing:-.01em}
 header .sp{flex:1}
 .save{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
@@ -59,6 +59,30 @@ input:focus,select:focus,button:focus-visible{outline:2px solid var(--accent);ou
 .b.top{color:#fff;background:var(--red)}
 .b.q{color:var(--accent);background:var(--accent-soft)}
 .grp{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:10px;padding:3px 6px 3px 10px;background:var(--soft);flex-wrap:wrap}
+.cal .cform{border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin:10px 0;background:var(--panel)}
+.cal .cform summary{cursor:pointer;font-weight:650}
+.cal .cfg{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:8px 0}
+.cal .cfg input[type=date]{padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--panel)}
+.cal .hd{display:flex;flex-direction:column;align-items:center;font-size:12px;color:var(--muted)}
+.cal .hd input{width:56px;padding:3px;border:1px solid var(--line);border-radius:6px;background:var(--panel);text-align:center}
+.cal .cs{font-size:12.5px;color:var(--muted)}
+.cal .csum{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0 6px}
+.cal .csum div{border:1px solid var(--line);border-radius:10px;padding:8px;text-align:center;background:var(--panel)}
+.cal .csum b{display:block;font-size:20px;color:var(--accent)} .cal .csum span{font-size:12px;color:var(--muted)}
+.cal .ctabs{display:flex;gap:6px;margin:14px 0 10px}
+.cal .cwk{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.cal .cwh{margin:18px 0 8px;font-size:15px}
+.cal .cd{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:10px;background:var(--panel)}
+.cal .cd.today{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.cal .cd.rest{opacity:.65}
+.cal .cdh{margin-bottom:6px} .cal .cdh b{text-transform:capitalize}
+.cal .ct{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:6px 0;border-top:1px solid var(--line)}
+.cal .ct label{display:flex;gap:8px;align-items:flex-start;cursor:pointer;flex:1;min-width:0}
+.cal .ct input{margin-top:4px}
+.cal .ct.ok b{text-decoration:line-through;color:var(--muted)}
+.cal .ca{display:flex;gap:4px;flex-wrap:wrap}
+@media (max-width:760px){.cal .csum{grid-template-columns:repeat(2,1fr)} .cal .ct{flex-wrap:wrap}}
+@media print{header,.tabs,#c-idx,#c-q,.cal-noprint{display:none!important} body,main{display:block;height:auto;background:#fff;color:#000} .col{display:block!important;max-height:none!important;overflow:visible!important;border:0} .scroll{max-height:none!important;overflow:visible!important} .cal .cd{break-inside:avoid}}
 .grpl{font-size:12px;font-weight:650;color:var(--muted);white-space:nowrap}
 /* centro */
 .searchrow{display:flex;gap:8px;align-items:center}
@@ -166,6 +190,7 @@ mark{background:#ffe066;color:#000;border-radius:2px}
     <button class="iconbtn hdr" id="bRank3940" title="Artículos más preguntados de las leyes 39 y 40/2015">🏆 Ranking</button>
   </span>
   <span class="sp"></span>
+  <button class="iconbtn hdr" id="bCal" title="Calendario de estudio por días, semanas y horas hasta el examen">📅 Calendario</button>
   <button class="iconbtn" id="bExport" title="Descargar un archivo con tu progreso (solo el de este navegador)">⬇ Exportar progreso</button>
   <button class="iconbtn" id="bImport" title="Cargar un archivo de progreso exportado antes; se fusiona con el actual">⬆ Importar progreso</button>
   <input type="file" id="fImport" accept=".json,application/json" hidden>
@@ -513,6 +538,7 @@ $("#bRank2").addEventListener("click",()=>showRanking(L3940.has(S.law)?"3940":""
 $("#bRank3940").addEventListener("click",()=>showRanking("3940"));
 function openBank(bk){ $("#fbank").value=bk; $("#fstat").value="pend"; $("#fart").checked=false; $("#ftopic").value="all"; $("#fexam").value="all"; buildQueue(); showTab("q"); }
 $("#bEx3940").addEventListener("click",()=>openBank("e3940"));
+$("#bCal").addEventListener("click",()=>window.showCalendar&&window.showCalendar());
 $("#bSim3940").addEventListener("click",()=>openBank("s3940"));
 $("#nEx3940").textContent=QS.filter(q=>inBank(q,"e3940")).length;
 $("#bHard").addEventListener("click",()=>{ $("#fbank").value="hard"; $("#fstat").value="pend"; $("#fart").checked=false; $("#ftopic").value="all"; $("#fexam").value="all"; buildQueue(); showTab("q"); });
@@ -542,9 +568,11 @@ $("#fImport").addEventListener("change",async e=>{
     if(!v||typeof v.ok!=="boolean") continue;
     if(!A[k]){ nuevas++; } else if((v.t||0)>(A[k].t||0)){ act++; } else continue;
   }
-  if(!nuevas&&!act){ alert("No hay nada nuevo en ese archivo: tu progreso ya está al día."); return; }
-  if(!confirm("Se añadirán "+nuevas+" respuestas nuevas y se actualizarán "+act+" con un intento más reciente.\nNo se borra nada de tu progreso actual. ¿Continuar?")) return;
+  const planNew = window.mergePlan ? window.mergePlan(d.plan,false) : false;
+  if(!nuevas&&!act&&!planNew){ alert("No hay nada nuevo en ese archivo: tu progreso ya está al día."); return; }
+  if(!confirm("Se añadirán "+nuevas+" respuestas nuevas y se actualizarán "+act+" con un intento más reciente."+(planNew?"\nTambién se añadirá lo marcado en el calendario de estudio.":"")+"\nNo se borra nada de tu progreso actual. ¿Continuar?")) return;
   for(const [k,v] of Object.entries(d.answers)){ if(v&&typeof v.ok==="boolean"&&(!A[k]||(v.t||0)>(A[k].t||0))) A[k]=v; }
+  if(planNew) window.mergePlan(d.plan,true);
   Store.save(); buildQueue(); Store.status("ok","Importado: "+(nuevas+act)+" respuestas");
 });
 
@@ -564,7 +592,9 @@ try{ const t=localStorage.getItem("alcoi-tema"); if(t) document.documentElement.
   buildQueue();
   if(location.hash==="#ranking") showRanking();
   if(location.hash==="#ranking3940") showRanking("3940");
+  if(location.hash==="#calendario") window.showCalendar&&window.showCalendar();
 })();
 </script>
+<script src="data/calendario.js"></script>
 </body>
 </html>
