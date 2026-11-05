@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Estudio Oposición Alcoi</title>
+<style>
+:root{
+  --bg:#f6f5f2; --panel:#ffffff; --ink:#1d1d1f; --muted:#6b6b70; --line:#e3e1dc; --soft:#f0eeea;
+  --accent:#1f4e8c; --accent-soft:#e6eef8;
+  --purple:#6a2c9c; --red:#b3261e; --green-bg:#d5edc8; --green:#2e7d32;
+  --ok-bg:#e3f4e1; --ok:#1e6b2a; --ko-bg:#fbe4e2; --ko:#a3221a; --warn:#8a5a00; --warn-bg:#fff3d6;
+  --shadow:0 1px 2px rgba(0,0,0,.06),0 2px 8px rgba(0,0,0,.04);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#141416; --panel:#1d1d20; --ink:#ececee; --muted:#a2a2a8; --line:#323236; --soft:#26262a;
+    --accent:#8fb5ee; --accent-soft:#22324a; --purple:#c9a2ee; --red:#ff8a80; --green-bg:#264a22; --green:#8bd48f;
+    --ok-bg:#1f3a22; --ok:#9be3a2; --ko-bg:#4a2220; --ko:#ffb3ab; --warn:#ffd27a; --warn-bg:#3d3013;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#141416; --panel:#1d1d20; --ink:#ececee; --muted:#a2a2a8; --line:#323236; --soft:#26262a;
+  --accent:#8fb5ee; --accent-soft:#22324a; --purple:#c9a2ee; --red:#ff8a80; --green-bg:#264a22; --green:#8bd48f;
+  --ok-bg:#1f3a22; --ok:#9be3a2; --ko-bg:#4a2220; --ko:#ffb3ab; --warn:#ffd27a; --warn-bg:#3d3013;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+button,input,select{font:inherit;color:inherit}
+header{display:flex;align-items:center;gap:16px;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--panel)}
+header h1{font-size:17px;margin:0;font-weight:650;letter-spacing:-.01em}
+header .sp{flex:1}
+.save{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.dot.ok{background:var(--green)} .dot.local{background:#d49b00} .dot.err{background:var(--red)}
+.iconbtn{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:5px 10px;cursor:pointer;font-size:13px}
+.iconbtn:hover{background:var(--soft)}
+main{display:grid;grid-template-columns:minmax(240px,300px) minmax(0,1fr) minmax(340px,440px);height:calc(100% - 53px)}
+.col{min-height:0;display:flex;flex-direction:column;border-right:1px solid var(--line)}
+.col:last-child{border-right:0}
+.colhead{padding:12px 14px;border-bottom:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;gap:8px}
+.colhead h2{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0;font-weight:600}
+.scroll{overflow:auto;flex:1;min-height:0}
+select,input[type=search],input[type=text]{width:100%;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+/* índice */
+.tree{padding:6px 0 30px;overflow-x:hidden}
+.tree .h{padding:10px 14px 4px;font-size:12px;font-weight:650;color:var(--muted);text-transform:none}
+.tree .h.l1{color:var(--accent);font-size:12.5px;padding-top:14px}
+.tree .h.l3{padding-left:22px;font-weight:600}
+.tree .a{display:flex;gap:8px;align-items:baseline;padding:5px 14px 5px 22px;cursor:pointer;border-left:3px solid transparent}
+.tree .a:hover{background:var(--soft)}
+.tree .a.sel{background:var(--accent-soft);border-left-color:var(--accent)}
+.tree .a .n{font-weight:600;white-space:nowrap;font-size:13.5px}
+.tree .a .s{color:var(--muted);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+.b{font-size:11px;border-radius:10px;padding:0 6px;white-space:nowrap;font-weight:600}
+.b.ex{color:var(--green);background:var(--green-bg)}
+.b.top{color:#fff;background:var(--red)}
+.b.q{color:var(--accent);background:var(--accent-soft)}
+.grp{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:10px;padding:3px 6px 3px 10px;background:var(--soft);flex-wrap:wrap}
+.grpl{font-size:12px;font-weight:650;color:var(--muted);white-space:nowrap}
+/* centro */
+.searchrow{display:flex;gap:8px;align-items:center}
+.searchrow input{flex:1;min-width:0}
+.searchrow{flex-wrap:wrap}
+.chk{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--muted);white-space:nowrap}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:12.5px;color:var(--muted)}
+.legend label{display:flex;gap:5px;align-items:center;cursor:pointer}
+.article{max-width:820px;margin:0 auto;padding:22px 28px 60px}
+.article .crumb{font-size:12.5px;color:var(--muted);margin-bottom:6px}
+.article h3{font-size:22px;margin:0 0 6px;letter-spacing:-.01em}
+.article .meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.article p{margin:0 0 10px;text-align:justify}
+.article p.li{padding-left:20px}
+.nav{display:flex;gap:8px;margin-top:22px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:7px 12px;cursor:pointer}
+.btn:hover{background:var(--soft)}
+.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+:root[data-theme="dark"] .btn.primary{color:#0d1a2b}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.primary{color:#0d1a2b}}
+.mk-u .u{text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:2px;color:var(--purple)}
+.mk-r .r{color:var(--red);font-weight:650}
+.mk-r .u.r{color:var(--red)}
+.mk-g .g{background:var(--green-bg);border-radius:2px}
+mark{background:#ffe066;color:#000;border-radius:2px}
+.flash{animation:flash 1.6s ease-out}
+@keyframes flash{0%{background:#ffe9a8}100%{background:transparent}}
+.results{max-width:820px;margin:0 auto;padding:14px 28px 40px}
+.res{padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;cursor:pointer;background:var(--panel)}
+.res:hover{border-color:var(--accent)}
+.res .t{font-weight:600;font-size:13.5px}
+.res .x{font-size:13px;color:var(--muted)}
+.empty{color:var(--muted);padding:30px;text-align:center}
+/* preguntas */
+.filters{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.filters .full{grid-column:1/-1}
+.stats{font-size:12.5px;color:var(--muted)}
+.bar{height:6px;border-radius:4px;background:var(--soft);overflow:hidden;margin-top:4px;display:flex}
+.bar span{display:block;height:100%}
+.qwrap{padding:14px}
+.qcard{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:var(--shadow)}
+.qmeta{font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 10px;margin-bottom:8px}
+.qtext{font-weight:560;margin-bottom:12px}
+.opt{display:flex;gap:10px;width:100%;text-align:left;border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:9px 11px;margin-bottom:7px;cursor:pointer;line-height:1.4}
+.opt:hover:not(:disabled){border-color:var(--accent);background:var(--accent-soft)}
+.opt .L{font-weight:700;min-width:18px}
+.opt:disabled{cursor:default}
+.opt.right{background:var(--ok-bg);border-color:var(--ok)}
+.opt.wrong{background:var(--ko-bg);border-color:var(--ko)}
+.fb{margin-top:10px;border-radius:10px;padding:12px;font-size:14px}
+.fb.ok{background:var(--ok-bg);color:var(--ok)}
+.fb.ko{background:var(--ko-bg);color:var(--ko)}
+.why{margin-top:10px;border:1px solid var(--line);border-radius:10px;padding:12px;font-size:14px;background:var(--soft)}
+.why .src{font-size:12.5px;margin-bottom:6px}
+.why .src b.of{color:var(--green)} .why .src b.pr{color:var(--purple)} .why .src b.du{color:var(--red)}
+.why blockquote{margin:8px 0;padding:8px 10px;border-left:3px solid var(--accent);background:var(--panel);border-radius:0 8px 8px 0;font-size:13.5px}
+.qnav{display:flex;gap:8px;margin-top:12px;justify-content:space-between;align-items:center}
+.qnav .btn{white-space:nowrap}
+@media (max-width:1400px){.qnav .kbd{display:none}}
+.kbd{font-size:11.5px;color:var(--muted)}
+.tabs{display:none}
+.hdr{font-weight:600}
+.note{border:1px solid #e0c46c;background:#fff8e1;color:#5d4500;border-radius:10px;padding:10px 12px;margin:0 0 14px;font-size:14px}
+:root[data-theme="dark"] .note{background:#3a3115;color:#ffe7a3;border-color:#7a6420}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .note{background:#3a3115;color:#ffe7a3;border-color:#7a6420}}
+.rank{max-width:1000px;margin:0 auto;padding:18px 22px 50px}
+.rank h3{margin:0 0 4px;font-size:20px}
+.rank table{width:100%;border-collapse:collapse;font-size:13.5px}
+.rank th{position:sticky;top:0;background:var(--panel);text-align:left;font-size:12px;color:var(--muted);padding:8px 6px;border-bottom:2px solid var(--line)}
+.rank td{padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+.rank tr:hover td{background:var(--soft)}
+.rank .pos{font-weight:700;color:var(--accent);width:34px}
+.rank .art{font-weight:650;cursor:pointer;color:var(--accent)}
+.rank .sub{color:var(--muted);font-size:12.5px}
+.rank details summary{cursor:pointer;color:var(--purple);font-weight:600;font-size:12.5px}
+.rank .nt{margin-top:6px;font-size:13px}
+.rank .num{text-align:center;white-space:nowrap}
+@media (max-width:1100px){
+  main{grid-template-columns:minmax(220px,260px) minmax(0,1fr)}
+  main .col.q{grid-column:1/-1;border-top:1px solid var(--line)}
+  main{height:auto} .col{max-height:none} .scroll{max-height:70vh}
+}
+@media (max-width:760px){
+  header{flex-wrap:wrap;gap:8px;padding:10px 16px}
+  .tabs{display:flex;gap:6px;padding:8px 16px;background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:2}
+  .tabs button{flex:1;border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:7px;cursor:pointer}
+  .tabs button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+  main{display:block}
+  .col{display:none;border:0} .col.on{display:flex}
+  .scroll{max-height:none}
+  .article,.results{padding:16px}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Estudio · Administrativo Alcoi</h1>
+  <button class="iconbtn hdr" id="bRank" title="Artículos más preguntados">🏆 Ranking de artículos</button>
+  <button class="iconbtn hdr" id="bHard" title="500 preguntas de nivel tribunal exigente">🔥 Simulacro difícil (500)</button>
+  <button class="iconbtn hdr" id="bHard2" title="460 preguntas sobre los artículos 51–142 del ranking">🔥 Simulacro 2 (460)</button>
+  <span class="grp" title="Leyes 39/2015 y 40/2015, añadidas al temario">
+    <span class="grpl">Leyes 39 y 40/2015</span>
+    <button class="iconbtn hdr" id="bEx3940" title="Preguntas de exámenes reales sobre las leyes 39/2015 y 40/2015">📝 Exámenes (<span id="nEx3940"></span>)</button>
+    <button class="iconbtn hdr" id="bSim3940" title="500 preguntas nuevas sobre los artículos más preguntados de las leyes 39 y 40/2015">🔥 Simulacro (500)</button>
+    <button class="iconbtn hdr" id="bRank3940" title="Artículos más preguntados de las leyes 39 y 40/2015">🏆 Ranking</button>
+  </span>
+  <span class="sp"></span>
+  <span class="save" id="save"><span class="dot" id="savedot"></span><span id="savetxt">Cargando…</span></span>
+  <button class="iconbtn" id="theme" title="Cambiar tema claro/oscuro">◐</button>
+</header>
+<div class="tabs" id="tabs">
+  <button data-c="idx">Índice</button><button data-c="art" class="on">Artículo</button><button data-c="q">Preguntas</button>
+</div>
+<main>
+  <section class="col idx" id="c-idx">
+    <div class="colhead">
+      <h2>Ley</h2>
+      <select id="law"></select>
+      <input type="search" id="idxf" placeholder="Filtrar índice (p. ej. 21, Pleno, padrón)">
+    </div>
+    <div class="scroll"><div class="tree" id="tree"></div></div>
+  </section>
+
+  <section class="col art on" id="c-art">
+    <div class="colhead">
+      <h2>Buscador</h2>
+      <div class="searchrow">
+        <input type="search" id="q" placeholder="Artículo (21, art. 22, 85 bis) o palabras (quórum, mayoría absoluta…)">
+        <label class="chk"><input type="checkbox" id="all"> todas las leyes</label>
+        <button class="btn" id="bRank2" title="Ver los artículos y leyes más preguntados" style="white-space:nowrap">🏆 Ranking</button>
+      </div>
+      <div class="legend">
+        <label><input type="checkbox" id="mu" checked> <span style="color:var(--purple);text-decoration:underline">Palabras gancho</span></label>
+        <label><input type="checkbox" id="mr" checked> <b style="color:var(--red)">Lo más importante</b></label>
+        <label><input type="checkbox" id="mg" checked> <span style="background:var(--green-bg)">Preguntado en exámenes</span></label>
+      </div>
+    </div>
+    <div class="scroll" id="center"></div>
+  </section>
+
+  <section class="col q" id="c-q">
+    <div class="colhead">
+      <h2>Preguntas de examen</h2>
+      <div class="filters">
+        <select id="fbank" class="full" title="Banco de preguntas"><option value="adm">Exámenes oficiales de Administrativo</option><option value="hard">Simulacro difícil (Claude, 500)</option><option value="hard2">Simulacro 2 (Claude, resto del ranking, 460)</option><option value="e3940">Leyes 39 y 40/2015: preguntas de exámenes</option><option value="s3940">Leyes 39 y 40/2015: simulacro (Claude, 500)</option><option value="all">Todos los bancos</option></select>
+        <select id="ftopic" class="full" title="Ley o tema"></select>
+        <select id="fexam" class="full" title="Examen"></select>
+        <select id="fsrc" title="Fuente de la respuesta">
+          <option value="all">Todas las fuentes</option><option value="oficial">Solo plantilla oficial</option><option value="propuesta">Solo propuestas</option><option value="claude">Redactadas por Claude</option>
+        </select>
+        <select id="fstat" title="Estado">
+          <option value="pend">Sin responder</option><option value="fail">Falladas</option><option value="all">Todas</option><option value="ok">Acertadas</option>
+        </select>
+        <select id="ford" title="Orden"><option value="seq">Orden del examen</option><option value="rnd">Aleatorio</option></select>
+        <label class="chk"><input type="checkbox" id="fart"> Solo artículo abierto</label>
+      </div>
+      <div class="stats" id="stats"></div>
+    </div>
+    <div class="scroll"><div class="qwrap" id="qwrap"></div></div>
+  </section>
+</main>
+
+<script src="data/laws.js"></script>
+<script src="data/questions.js"></script>
+<script src="data/ranking.js"></script>
+<script>
+"use strict";
+const LAWS = window.LAWS, QS = window.QUESTIONS;
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const norm = s => String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+const LAWKEYS = Object.keys(LAWS);
+const ABC = ["a","b","c","d"];
+
+/* ---------- índices de datos ---------- */
+const L3940 = new Set(["lpac","lrjsp"]);
+function inBank(q,bk){ if(bk==="all") return true; if(bk==="e3940") return (q.b==="adm"||q.b==="tag3940")&&L3940.has(q.law); if(bk==="adm") return q.b==="adm"; return q.b===bk; }
+const ART = {};          // ART[law] = [{id,t,p,ex,alc,top,path,idx}]
+for (const law of LAWKEYS){
+  const arr=[]; const path=[];
+  for (const n of LAWS[law].nodes){
+    if (n.k==="h"){ path[n.lv-1]=n.t; path.length=n.lv; arr.push({h:true,lv:n.lv,t:n.t}); }
+    else { const a=Object.assign({},n,{path:path.filter(Boolean).slice(),law}); a.plain=a.p.map(par=>par.map(s=>typeof s==="string"?s:s[0]).join("")); arr.push(a); }
+  }
+  ART[law]=arr;
+}
+const artOf = (law,id) => ART[law] && ART[law].find(a=>!a.h && a.id===id);
+const QBYART = {};
+for (const q of QS){ if(q.law&&q.art){ const k=q.law+"|"+q.art; (QBYART[k]=QBYART[k]||[]).push(q); } }
+
+/* ---------- progreso: servidor local o navegador ---------- */
+const Store = {
+  mode:"local", data:{v:1,answers:{},last:{}}, timer:null,
+  async init(){
+    let local=null;
+    try{ local=JSON.parse(localStorage.getItem("alcoi-progreso")||"null"); }catch(e){}
+    if (location.protocol.startsWith("http")){
+      try{
+        const r=await fetch("/api/progress",{cache:"no-store"});
+        if(r.ok){ const d=await r.json(); this.mode="server"; this.data=d;
+          if(local && local.answers){ for(const [k,v] of Object.entries(local.answers)){ if(!d.answers[k] || (v.t||0)>(d.answers[k].t||0)) d.answers[k]=v; } }
+          this.status("ok","Progreso guardado en progreso.json"); this.save(); return; }
+      }catch(e){}
+    }
+    if(local&&local.answers) this.data=local;
+    this.status("local","Progreso guardado en este navegador");
+  },
+  status(kind,txt){ $("#savedot").className="dot "+kind; $("#savetxt").textContent=txt; },
+  save(){
+    try{ localStorage.setItem("alcoi-progreso",JSON.stringify(this.data)); }catch(e){}
+    if(this.mode!=="server") return;
+    clearTimeout(this.timer);
+    this.timer=setTimeout(async()=>{
+      try{
+        const r=await fetch("/api/progress",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(this.data)});
+        if(!r.ok) throw new Error(r.status);
+        const j=await r.json(); this.status("ok","Guardado "+j.saved.slice(11,16)+" · "+j.n+" respuestas");
+      }catch(e){ this.status("err","Sin conexión con el servidor: guardado en el navegador"); }
+    },350);
+  }
+};
+
+/* ---------- estado ---------- */
+const S = { law:"lbrl", art:null, search:"", qlist:[], qi:0, answered:null };
+
+/* ---------- índice ---------- */
+function fillLaws(){
+  const sel=$("#law");
+  sel.innerHTML=LAWKEYS.map(k=>`<option value="${k}">${esc(LAWS[k].name)}</option>`).join("");
+  sel.value=S.law;
+}
+function renderTree(){
+  const f=norm($("#idxf").value.trim());
+  const out=[];
+  for(const n of ART[S.law]){
+    if(n.h){ if(!f) out.push(`<div class="h l${n.lv}">${esc(n.t)}</div>`); continue; }
+    const first=(n.plain[0]||"").slice(0,90);
+    if(f){ const num=f.replace(/^art(iculo)?\.?\s*/,""); if(!(norm(n.id)===num || norm(n.t).includes(f) || norm(n.plain.join(" ")).includes(f))) continue; }
+    const nq=(QBYART[S.law+"|"+n.id]||[]).length;
+    out.push(`<div class="a${S.art===n.id?" sel":""}" data-id="${esc(n.id)}"><span class="n">${esc(n.t.replace(/^Artículo/,"Art."))}</span><span class="s">${esc(first)}</span>${n.top?'<span class="b top" title="Prioridad máxima">A</span>':""}${n.ex?`<span class="b ex" title="Exámenes en que ha salido">${n.ex}</span>`:""}${nq?`<span class="b q" title="Preguntas en el banco">${nq}P</span>`:""}</div>`);
+  }
+  $("#tree").innerHTML=out.join("")||`<div class="empty">Nada coincide con el filtro.</div>`;
+}
+$("#tree").addEventListener("click",e=>{ const a=e.target.closest(".a"); if(a) openArt(S.law,a.dataset.id); });
+$("#law").addEventListener("change",e=>{ S.law=e.target.value; S.art=null; renderTree(); const first=ART[S.law].find(a=>!a.h&&/^\d/.test(a.id)); if(first) openArt(S.law,first.id); });
+$("#idxf").addEventListener("input",renderTree);
+
+/* ---------- artículo ---------- */
+function segHTML(par,terms){
+  return par.map(s=>{
+    let t,f=""; if(typeof s==="string") t=s; else {t=s[0]; f=s[1]||"";}
+    let h=esc(t);
+    if(terms.length) h=highlight(h,terms);
+    if(!f) return h;
+    return `<span class="${f.split("").join(" ")}">${h}</span>`;
+  }).join("");
+}
+function highlight(h,terms){
+  for(const t of terms){ if(t.length<3) continue;
+    const re=new RegExp("("+t.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+")","gi"); h=h.replace(re,"<mark>$1</mark>"); }
+  return h;
+}
+function openArt(law,id,opts={}){
+  const a=artOf(law,id); if(!a) return;
+  if(S.law!==law){ S.law=law; $("#law").value=law; }
+  S.art=id; Store.data.last={law,art:id}; Store.save();
+  renderTree();
+  const sel=$("#tree .a.sel"); if(sel && !opts.noscroll) sel.scrollIntoView({block:"nearest"});
+  const terms=opts.terms||[];
+  const list=ART[law].filter(x=>!x.h); const i=list.indexOf(a);
+  const nq=(QBYART[law+"|"+id]||[]).length;
+  const pars=a.p.map((par,k)=>{ const txt=a.plain[k]; const li=/^[a-zñ]\)\s/.test(txt);
+    return `<p class="${li?"li":""}" data-k="${k}">${segHTML(par,terms)}</p>`; }).join("");
+  $("#center").innerHTML=`<div class="article ${marksClass()}">
+    <div class="crumb">${esc(LAWS[law].short)}${a.path.length?" · "+esc(a.path.join(" · ")):""}</div>
+    <h3>${esc(a.t)}</h3>
+    <div class="meta">${a.top?'<span class="b top">Prioridad A</span>':""}${a.ex?`<span class="b ex">Ha salido en ${a.ex} examen${a.ex>1?"es":""}${a.alc?" · también en Alcoi":""}</span>`:""}${nq?`<span class="b q">${nq} pregunta${nq>1?"s":""} en el banco</span>`:""}</div>
+    ${noteHTML(law,id)}
+    ${pars||'<p class="empty">Sin contenido.</p>'}
+    <div class="nav">
+      ${i>0?`<button class="btn" data-go="${esc(list[i-1].id)}">← ${esc(list[i-1].t.replace(/^Artículo/,"Art."))}</button>`:""}
+      ${i<list.length-1?`<button class="btn" data-go="${esc(list[i+1].id)}">${esc(list[i+1].t.replace(/^Artículo/,"Art."))} →</button>`:""}
+      ${nq?`<button class="btn primary" id="practice">Practicar las ${nq} preguntas de este artículo</button>`:""}
+    </div></div>`;
+  $("#center").scrollTop=0;
+  if(opts.flash!=null){ const p=$(`#center p[data-k="${opts.flash}"]`); if(p){ p.classList.add("flash"); p.scrollIntoView({block:"center"}); } }
+  if($("#fart").checked) buildQueue();
+  if(opts.tab) showTab("art");
+}
+$("#center").addEventListener("click",e=>{
+  const g=e.target.closest("[data-go]"); if(g) return openArt(S.law,g.dataset.go);
+  if(e.target.id==="practice"){ $("#fart").checked=true; $("#fstat").value="all"; $("#ftopic").value="all"; $("#fexam").value="all"; buildQueue(); showTab("q"); }
+  const r=e.target.closest(".res"); if(r) openArt(r.dataset.law,r.dataset.id,{terms:S.terms,flash:+r.dataset.k});
+});
+function marksClass(){ return [$("#mu").checked?"mk-u":"",$("#mr").checked?"mk-r":"",$("#mg").checked?"mk-g":""].join(" "); }
+for(const id of ["#mu","#mr","#mg"]) $(id).addEventListener("change",()=>{ const el=$("#center .article"); if(el) el.className="article "+marksClass(); });
+
+/* ---------- buscador ---------- */
+function doSearch(){
+  const raw=$("#q").value.trim(); S.terms=[];
+  if(!raw){ if(S.art) openArt(S.law,S.art); return; }
+  const m=raw.match(/^(?:art(?:[íi]culo)?\.?\s*)?(\d+)(?:\s*(bis|ter|qu[aá]ter))?$/i);
+  if(m){
+    const id=m[1]+(m[2]?" "+norm(m[2]):"");
+    const laws=$("#all").checked?LAWKEYS:[S.law];
+    const hits=laws.filter(l=>artOf(l,id));
+    if(hits.length===1) return openArt(hits[0],id);
+    if(hits.length>1) return renderResults(hits.map(l=>({law:l,a:artOf(l,id),k:0,snip:artOf(l,id).plain[0]||""})),raw);
+    $("#center").innerHTML=`<div class="empty">No hay artículo ${esc(id)} en ${esc(LAWS[S.law].short)}.</div>`; return;
+  }
+  const terms=norm(raw).split(/\s+/).filter(t=>t.length>=2);
+  S.terms=raw.split(/\s+/).filter(t=>t.length>=3);
+  const laws=$("#all").checked?LAWKEYS:[S.law];
+  const res=[];
+  for(const l of laws) for(const a of ART[l]){ if(a.h) continue;
+    a.plain.forEach((txt,k)=>{ const nt=norm(txt); if(terms.every(t=>nt.includes(t))) res.push({law:l,a,k,snip:txt}); });
+  }
+  renderResults(res.slice(0,300),raw,res.length);
+}
+function renderResults(res,raw,total){
+  const terms=raw.split(/\s+/).filter(t=>t.length>=3);
+  $("#center").innerHTML=`<div class="results"><div class="stats" style="margin-bottom:10px">${total??res.length} resultado${(total??res.length)===1?"":"s"} para «${esc(raw)}»${total>300?" (se muestran 300)":""}</div>`+
+    (res.map(r=>`<div class="res" data-law="${r.law}" data-id="${esc(r.a.id)}" data-k="${r.k}"><div class="t">${esc(LAWS[r.law].short)} · ${esc(r.a.t)} ${r.a.ex?`<span class="b ex">${r.a.ex}</span>`:""}</div><div class="x">${highlight(esc(snip(r.snip,terms)),terms)}</div></div>`).join("")||'<div class="empty">Sin resultados.</div>')+`</div>`;
+}
+function snip(t,terms){ if(t.length<=260) return t; const n=norm(t); let i=terms.length?n.indexOf(norm(terms[0])):0; i=Math.max(0,i-80); return (i>0?"…":"")+t.slice(i,i+260)+"…"; }
+let st; $("#q").addEventListener("input",()=>{ clearTimeout(st); st=setTimeout(doSearch,220); });
+$("#q").addEventListener("keydown",e=>{ if(e.key==="Enter"){ clearTimeout(st); doSearch(); } });
+$("#all").addEventListener("change",doSearch);
+
+/* ---------- preguntas ---------- */
+const TOPICS=[...new Set(QS.map(q=>q.topic))].sort((a,b)=>QS.filter(q=>q.topic===b).length-QS.filter(q=>q.topic===a).length);
+const EXAMS=[...new Set(QS.map(q=>q.ex))];
+function fillFilters(){
+  $("#ftopic").innerHTML=`<option value="all">Todas las leyes y temas (${QS.length})</option>`+TOPICS.map(t=>`<option value="${esc(t)}">${esc(t)} (${QS.filter(q=>q.topic===t).length})</option>`).join("");
+  $("#fexam").innerHTML=`<option value="all">Todos los exámenes (${EXAMS.length})</option>`+EXAMS.map(t=>`<option value="${esc(t)}">${esc(t)} (${QS.filter(q=>q.ex===t).length})</option>`).join("");
+}
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function buildQueue(keep){
+  const t=$("#ftopic").value,e=$("#fexam").value,s=$("#fsrc").value,st=$("#fstat").value,onlyArt=$("#fart").checked;
+  const A=Store.data.answers;
+  const bk=$("#fbank").value;
+  let l=QS.filter(q=>inBank(q,bk)&&(t==="all"||q.topic===t)&&(e==="all"||q.ex===e)&&(s==="all"||q.src===s)
+    &&(!onlyArt||(q.law===S.law&&q.art===S.art))
+    &&(st==="all"||(st==="pend"&&!A[q.id])||(st==="fail"&&A[q.id]&&!A[q.id].ok)||(st==="ok"&&A[q.id]&&A[q.id].ok)));
+  if($("#ford").value==="rnd") shuffle(l);
+  S.qlist=l; S.qi=0; S.answered=null;
+  renderStats(); renderQ();
+}
+for(const id of ["#fbank","#ftopic","#fexam","#fsrc","#fstat","#ford","#fart"]) $(id).addEventListener("change",()=>buildQueue());
+
+function renderStats(){
+  const t=$("#ftopic").value,e=$("#fexam").value;
+  const bk=$("#fbank").value;
+  const pool=QS.filter(q=>inBank(q,bk)&&(t==="all"||q.topic===t)&&(e==="all"||q.ex===e));
+  const A=Store.data.answers; let ok=0,ko=0;
+  for(const q of pool){ const a=A[q.id]; if(a){ a.ok?ok++:ko++; } }
+  const n=pool.length, done=ok+ko, pct=done?Math.round(100*ok/done):0;
+  $("#stats").innerHTML=`${done} de ${n} respondidas · <b style="color:var(--ok)">${ok} aciertos</b> · <b style="color:var(--ko)">${ko} fallos</b>${done?` · ${pct}% de acierto`:""} · en cola: ${S.qlist.length}
+  <div class="bar"><span style="width:${100*ok/n||0}%;background:var(--green)"></span><span style="width:${100*ko/n||0}%;background:var(--red)"></span></div>`;
+}
+function renderQ(){
+  const box=$("#qwrap");
+  if(!S.qlist.length){
+    const st=$("#fstat").value;
+    box.innerHTML=`<div class="empty">${st==="pend"?"¡Has respondido todas las preguntas de este filtro! Cambia el estado a «Falladas» para repasar.":st==="fail"?"No tienes fallos en este filtro.":"No hay preguntas con estos filtros."}</div>`; return;
+  }
+  const q=S.qlist[S.qi]; const prev=Store.data.answers[q.id];
+  box.innerHTML=`<div class="qcard">
+    <div class="qmeta"><span>${S.qi+1} / ${S.qlist.length}</span><span>${esc(q.ex)}${q.n&&q.n!=="?"?" · nº "+esc(q.n):""}</span><span>${esc(q.topic)}</span>${prev?`<span>Último intento: ${prev.ok?"✔ acertada":"✘ fallada"}</span>`:""}</div>
+    <div class="qtext">${esc(q.q)}</div>
+    <div id="opts">${q.o.map((o,i)=>`<button class="opt" data-l="${ABC[i]}"><span class="L">${ABC[i]})</span><span>${esc(o)}</span></button>`).join("")}</div>
+    <div id="fb"></div>
+    <div class="qnav"><button class="btn" id="qprev" ${S.qi?"":"disabled"}>← Anterior</button><span class="kbd">Teclas: A–D responder · → siguiente</span><button class="btn primary" id="qnext">${S.qi<S.qlist.length-1?"Siguiente →":"Volver a empezar"}</button></div>
+  </div>`;
+  S.answered=null;
+}
+function answer(l){
+  if(S.answered) return;
+  const q=S.qlist[S.qi]; S.answered=l;
+  const ok=l===q.a;
+  const A=Store.data.answers; const prev=A[q.id];
+  A[q.id]={c:l,ok,n:(prev?prev.n:0)+1,t:Date.now()};
+  Store.save();
+  document.querySelectorAll("#opts .opt").forEach(b=>{ b.disabled=true; if(b.dataset.l===q.a) b.classList.add("right"); else if(b.dataset.l===l) b.classList.add("wrong"); });
+  const ci=ABC.indexOf(q.a);
+  let src= q.src==="claude" ? `<b class="pr">${q.b==="hard2"?"Pregunta del Simulacro 2":q.b==="s3940"?"Pregunta del Simulacro de las leyes 39 y 40/2015":"Pregunta del simulacro difícil"}</b>: redactada por Claude sobre el texto literal del artículo, con el nivel de un tribunal exigente.<div style="margin-top:6px">${esc(q.why||"")}</div>` : q.src==="oficial" ? `<b class="of">Respuesta oficial</b>: plantilla publicada por el tribunal.`
+    : q.dud ? `<b class="du">Respuesta propuesta y dudosa</b>: no había plantilla oficial y el texto del escaneo no es claro. Compruébala con la ley.`
+    : `<b class="pr">Respuesta propuesta</b>: el tribunal no publicó plantilla (o no venía en el PDF); la respuesta es de Claude.`;
+  let why="";
+  if(q.law&&q.art){
+    const a=artOf(q.law,q.art);
+    const k=bestPar(a,q.o[ci]+" "+q.q);
+    why=`<div>Fundamento: <b>${esc(a.t)} ${esc(LAWS[q.law].short)}</b>${q.aprox?' <span class="kbd">(localizado por similitud de texto: el enunciado no cita el artículo)</span>':""}</div>
+      <blockquote>${esc(a.plain[k]||"")}</blockquote>
+      <button class="btn primary" id="goart" data-law="${q.law}" data-id="${esc(q.art)}" data-k="${k}">Ver el artículo completo →</button>`;
+  } else if(q.cit){
+    why=`<div>Fundamento: <b>${esc(q.cit)}</b> de la norma citada en el enunciado (${esc(q.topic)}). Esta norma no está entre las leyes de la carpeta, así que no puedo abrirla aquí.</div>`;
+  } else {
+    why=`<div>Tema: <b>${esc(q.topic)}</b>. El enunciado no cita artículo concreto.</div>`;
+  }
+  $("#fb").innerHTML=`<div class="fb ${ok?"ok":"ko"}">${ok?"✔ ¡Correcto!":`✘ Fallo. La respuesta correcta es la <b>${q.a})</b> ${esc(q.o[ci])}`}</div>
+    <div class="why"><div class="src">${src}</div>${why}</div>`;
+  renderStats();
+}
+function bestPar(a,text){
+  const w=new Set(norm(text).match(/[a-zñ]{4,}/g)||[]); let best=0,bs=-1;
+  a.plain.forEach((p,k)=>{ const pw=norm(p).match(/[a-zñ]{4,}/g)||[]; let s=0; const seen=new Set(); for(const x of pw){ if(w.has(x)&&!seen.has(x)){s++;seen.add(x);} } if(s>bs){bs=s;best=k;} });
+  return best;
+}
+function nextQ(){ if(S.qi<S.qlist.length-1){ S.qi++; renderQ(); } else { buildQueue(); } $("#qwrap").parentElement.scrollTop=0; }
+$("#qwrap").addEventListener("click",e=>{
+  const b=e.target.closest(".opt"); if(b&&!b.disabled) return answer(b.dataset.l);
+  if(e.target.id==="qnext") return nextQ();
+  if(e.target.id==="qprev"){ S.qi=Math.max(0,S.qi-1); return renderQ(); }
+  const g=e.target.closest("#goart"); if(g) openArt(g.dataset.law,g.dataset.id,{flash:+g.dataset.k,tab:true});
+});
+document.addEventListener("keydown",e=>{
+  if(["INPUT","SELECT","TEXTAREA"].includes(document.activeElement.tagName)) return;
+  const k=e.key.toLowerCase();
+  if(["a","b","c","d","1","2","3","4"].includes(k)){ const l=isNaN(+k)?k:ABC[+k-1]; if(S.qlist.length&&ABC.indexOf(l)<S.qlist[S.qi].o.length) answer(l); }
+  else if(k==="arrowright"||k==="enter"){ if(S.answered) nextQ(); }
+});
+
+
+/* ---------- notas mnemotécnicas y ranking ---------- */
+const NOTE={}; for(const r of [...(window.RANKING||[]),...(window.RANKING3940||[])]) if(r.note && !NOTE[r.law+"|"+r.art]) NOTE[r.law+"|"+r.art]=r.note;
+function noteHTML(law,id){ const n=NOTE[law+"|"+id]; return n?`<div class="note">💡 <b>Para memorizar:</b> ${esc(n)}</div>`:""; }
+function showRanking(which){
+  const is3940 = which==="3940";
+  const rows=((is3940?window.RANKING3940:window.RANKING)||[]).map((r,i)=>`<tr>
+    <td class="pos">${i+1}${r.pr?`<div><span class="b ${r.pr==="A"?"top":"ex"}" title="Prioridad">${r.pr}</span></div>`:""}</td>
+    <td><span class="b q">${esc(LAWS[r.law].short)}</span></td>
+    <td><div class="art" data-law="${r.law}" data-id="${esc(r.art)}">${esc(r.t)}</div><div class="sub"><b>${esc(r.mat||"")}</b>${r.cl?` — Lo que hay que clavar: ${esc(r.cl)}`:""}</div>
+      ${r.note?`<details><summary>💡 Nota mnemotécnica</summary><div class="nt">${esc(r.note)}</div></details>`:""}</td>
+    <td class="num">${r.n}${r.alc?`<div class="sub">${r.alc} de Alcoi</div>`:""}</td>
+    <td class="num">${r.ex}</td>
+    <td class="num"><button class="btn" data-go="${r.law}|${esc(r.art)}">Ir al artículo</button><br><button class="btn" style="margin-top:4px" data-pr="${r.law}|${esc(r.art)}">Practicar</button></td></tr>`).join("");
+  const intro = is3940
+    ? `<h3>🏆 Leyes 39/2015 y 40/2015: artículos más preguntados</h3>
+    <p class="stats">Ranking de ${rows.length} artículos de la LPAC y la LRJSP. Combina las preguntas reales de examen que tengo de estas leyes (las de los 37 exámenes de Administrativo de Alcoi, Alicante, Valencia, Diputació y Generalitat, más las de 20 exámenes de TAG y Técnico de Gestión) con lo que más se repite en los exámenes publicados de Administrativo y Auxiliar. <b>A</b> = máxima, <b>B</b> = alta, <b>C</b> = media. Todos llevan nota mnemotécnica. La columna «Preguntas» cuenta solo las preguntas de examen que citan o se localizan en ese artículo.</p>`
+    : `<h3>🏆 Artículos más preguntados</h3>
+    <p class="stats">Es la tabla de artículos más preguntables de las 7 leyes de la carpeta Alcoy2 (la misma del Word «0_Tabla_articulos_mas_preguntables»). Sale de 37 exámenes de Administrativo y Auxiliar de Alcoi, las provincias de Alicante y Valencia, la Diputació y la Generalitat. <b>A</b> = máxima (salió en Alcoi o en muchos exámenes), <b>B</b> = alta, <b>C</b> = media. Los 50 primeros llevan nota mnemotécnica. Pulsa un artículo para estudiarlo con sus colores y su nota. Las leyes 39 y 40/2015 tienen su propio ranking (botón de la cabecera).</p>`;
+  $("#center").innerHTML=`<div class="rank">${intro}
+    <table><thead><tr><th>#</th><th>Ley</th><th>Artículo y qué clavar</th><th>Preguntas</th><th>Exámenes</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  $("#center").scrollTop=0; showTab("art");
+}
+$("#bRank").addEventListener("click",()=>showRanking());
+$("#bRank2").addEventListener("click",()=>showRanking(L3940.has(S.law)?"3940":""));
+$("#bRank3940").addEventListener("click",()=>showRanking("3940"));
+function openBank(bk){ $("#fbank").value=bk; $("#fstat").value="pend"; $("#fart").checked=false; $("#ftopic").value="all"; $("#fexam").value="all"; buildQueue(); showTab("q"); }
+$("#bEx3940").addEventListener("click",()=>openBank("e3940"));
+$("#bSim3940").addEventListener("click",()=>openBank("s3940"));
+$("#nEx3940").textContent=QS.filter(q=>inBank(q,"e3940")).length;
+$("#bHard").addEventListener("click",()=>{ $("#fbank").value="hard"; $("#fstat").value="pend"; $("#fart").checked=false; $("#ftopic").value="all"; $("#fexam").value="all"; buildQueue(); showTab("q"); });
+$("#bHard2").addEventListener("click",()=>{ $("#fbank").value="hard2"; $("#fstat").value="pend"; $("#fart").checked=false; $("#ftopic").value="all"; $("#fexam").value="all"; buildQueue(); showTab("q"); });
+$("#center").addEventListener("click",e=>{
+  const a=e.target.closest(".rank .art"); if(a) return openArt(a.dataset.law,a.dataset.id);
+  const g=e.target.closest(".rank [data-go]"); if(g){ const [l,i]=g.dataset.go.split("|"); return openArt(l,i); }
+  const p=e.target.closest(".rank [data-pr]"); if(p){ const [l,i]=p.dataset.pr.split("|"); openArt(l,i); $("#fbank").value="all"; $("#fart").checked=true; $("#fstat").value="all"; $("#ftopic").value="all"; $("#fexam").value="all"; buildQueue(); showTab("q"); }
+});
+
+/* ---------- pestañas móvil y tema ---------- */
+function showTab(c){ document.querySelectorAll(".col").forEach(x=>x.classList.toggle("on",x.id==="c-"+c)); document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.c===c)); }
+$("#tabs").addEventListener("click",e=>{ const b=e.target.closest("button"); if(b) showTab(b.dataset.c); });
+$("#theme").addEventListener("click",()=>{ const r=document.documentElement; const dark=r.dataset.theme? r.dataset.theme==="dark" : matchMedia("(prefers-color-scheme: dark)").matches; r.dataset.theme=dark?"light":"dark"; try{localStorage.setItem("alcoi-tema",r.dataset.theme);}catch(e){} });
+try{ const t=localStorage.getItem("alcoi-tema"); if(t) document.documentElement.dataset.theme=t; }catch(e){}
+
+/* ---------- arranque ---------- */
+(async function(){
+  await Store.init();
+  fillLaws(); fillFilters();
+  const last=Store.data.last||{};
+  if(last.law&&artOf(last.law,last.art)){ S.law=last.law; $("#law").value=S.law; openArt(last.law,last.art); }
+  else { renderTree(); openArt("lbrl","46"); }
+  buildQueue();
+  if(location.hash==="#ranking") showRanking();
+  if(location.hash==="#ranking3940") showRanking("3940");
+})();
+</script>
+</body>
+</html>
