@@ -166,6 +166,9 @@ mark{background:#ffe066;color:#000;border-radius:2px}
     <button class="iconbtn hdr" id="bRank3940" title="Artículos más preguntados de las leyes 39 y 40/2015">🏆 Ranking</button>
   </span>
   <span class="sp"></span>
+  <button class="iconbtn" id="bExport" title="Descargar un archivo con tu progreso (solo el de este navegador)">⬇ Exportar progreso</button>
+  <button class="iconbtn" id="bImport" title="Cargar un archivo de progreso exportado antes; se fusiona con el actual">⬆ Importar progreso</button>
+  <input type="file" id="fImport" accept=".json,application/json" hidden>
   <span class="save" id="save"><span class="dot" id="savedot"></span><span id="savetxt">Cargando…</span></span>
   <button class="iconbtn" id="theme" title="Cambiar tema claro/oscuro">◐</button>
 </header>
@@ -518,6 +521,31 @@ $("#center").addEventListener("click",e=>{
   const a=e.target.closest(".rank .art"); if(a) return openArt(a.dataset.law,a.dataset.id);
   const g=e.target.closest(".rank [data-go]"); if(g){ const [l,i]=g.dataset.go.split("|"); return openArt(l,i); }
   const p=e.target.closest(".rank [data-pr]"); if(p){ const [l,i]=p.dataset.pr.split("|"); openArt(l,i); $("#fbank").value="all"; $("#fart").checked=true; $("#fstat").value="all"; $("#ftopic").value="all"; $("#fexam").value="all"; buildQueue(); showTab("q"); }
+});
+
+/* ---------- exportar / importar progreso ---------- */
+$("#bExport").addEventListener("click",()=>{
+  const d=Store.data, n=Object.keys(d.answers||{}).length;
+  const blob=new Blob([JSON.stringify({app:"estudio-alcoi",exportado:new Date().toISOString(),...d},null,1)],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+  a.download="progreso-alcoi-"+new Date().toISOString().slice(0,10)+".json";
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  Store.status("ok","Exportadas "+n+" respuestas");
+});
+$("#bImport").addEventListener("click",()=>$("#fImport").click());
+$("#fImport").addEventListener("change",async e=>{
+  const f=e.target.files[0]; e.target.value=""; if(!f) return;
+  let d; try{ d=JSON.parse(await f.text()); }catch(err){ alert("Ese archivo no es un progreso válido."); return; }
+  if(!d||typeof d.answers!=="object"){ alert("Ese archivo no es un progreso válido."); return; }
+  const A=Store.data.answers; let nuevas=0, act=0;
+  for(const [k,v] of Object.entries(d.answers)){
+    if(!v||typeof v.ok!=="boolean") continue;
+    if(!A[k]){ nuevas++; } else if((v.t||0)>(A[k].t||0)){ act++; } else continue;
+  }
+  if(!nuevas&&!act){ alert("No hay nada nuevo en ese archivo: tu progreso ya está al día."); return; }
+  if(!confirm("Se añadirán "+nuevas+" respuestas nuevas y se actualizarán "+act+" con un intento más reciente.\nNo se borra nada de tu progreso actual. ¿Continuar?")) return;
+  for(const [k,v] of Object.entries(d.answers)){ if(v&&typeof v.ok==="boolean"&&(!A[k]||(v.t||0)>(A[k].t||0))) A[k]=v; }
+  Store.save(); buildQueue(); Store.status("ok","Importado: "+(nuevas+act)+" respuestas");
 });
 
 /* ---------- pestañas móvil y tema ---------- */
