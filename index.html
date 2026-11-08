@@ -182,6 +182,7 @@ mark{background:#ffe066;color:#000;border-radius:2px}
   <h1>Estudio · Administrativo Alcoi</h1>
   <button class="iconbtn hdr" id="bRank" title="Artículos más preguntados">🏆 Ranking de artículos</button>
   <button class="iconbtn hdr" id="bHard" title="500 preguntas de nivel tribunal exigente">🔥 Simulacro difícil (500)</button>
+  <button class="iconbtn hdr" id="bCE100" title="100 preguntas literales de la Constitución, arts. 1 a 55, con trampas de examinador">📜 Test CE 1-55 (100)</button>
   <button class="iconbtn hdr" id="bHard2" title="460 preguntas sobre los artículos 51–142 del ranking">🔥 Simulacro 2 (460)</button>
   <span class="grp" title="Leyes 39/2015 y 40/2015, añadidas al temario">
     <span class="grpl">Leyes 39 y 40/2015</span>
@@ -231,7 +232,7 @@ mark{background:#ffe066;color:#000;border-radius:2px}
     <div class="colhead">
       <h2>Preguntas de examen</h2>
       <div class="filters">
-        <select id="fbank" class="full" title="Banco de preguntas"><option value="adm">Exámenes oficiales de Administrativo</option><option value="hard">Simulacro difícil (Claude, 500)</option><option value="hard2">Simulacro 2 (Claude, resto del ranking, 460)</option><option value="e3940">Leyes 39 y 40/2015: preguntas de exámenes</option><option value="s3940">Leyes 39 y 40/2015: simulacro (Claude, 500)</option><option value="all">Todos los bancos</option></select>
+        <select id="fbank" class="full" title="Banco de preguntas"><option value="adm">Exámenes oficiales de Administrativo</option><option value="hard">Simulacro difícil (Claude, 500)</option><option value="hard2">Simulacro 2 (Claude, resto del ranking, 460)</option><option value="e3940">Leyes 39 y 40/2015: preguntas de exámenes</option><option value="s3940">Leyes 39 y 40/2015: simulacro (Claude, 500)</option><option value="ce100">Test CE arts. 1-55 con trampas (Claude, 100)</option><option value="all">Todos los bancos</option></select>
         <select id="ftopic" class="full" title="Ley o tema"></select>
         <select id="fexam" class="full" title="Examen"></select>
         <select id="fsrc" title="Fuente de la respuesta">
@@ -251,6 +252,7 @@ mark{background:#ffe066;color:#000;border-radius:2px}
 
 <script src="data/laws.js"></script>
 <script src="data/questions.js"></script>
+<script src="data/test_ce.js"></script>
 <script src="data/ranking.js"></script>
 <script>
 "use strict";
@@ -472,7 +474,7 @@ function answer(l){
   Store.save();
   document.querySelectorAll("#opts .opt").forEach(b=>{ b.disabled=true; if(b.dataset.l===q.a) b.classList.add("right"); else if(b.dataset.l===l) b.classList.add("wrong"); });
   const ci=ABC.indexOf(q.a);
-  let src= q.src==="claude" ? `<b class="pr">${q.b==="hard2"?"Pregunta del Simulacro 2":q.b==="s3940"?"Pregunta del Simulacro de las leyes 39 y 40/2015":"Pregunta del simulacro difícil"}</b>: redactada por Claude sobre el texto literal del artículo, con el nivel de un tribunal exigente.<div style="margin-top:6px">${esc(q.why||"")}</div>` : q.src==="oficial" ? `<b class="of">Respuesta oficial</b>: plantilla publicada por el tribunal.`
+  let src= q.src==="claude" ? `<b class="pr">${q.b==="ce100"?"Test CE arts. 1-55 con trampas":q.b==="hard2"?"Pregunta del Simulacro 2":q.b==="s3940"?"Pregunta del Simulacro de las leyes 39 y 40/2015":"Pregunta del simulacro difícil"}</b>: redactada por Claude sobre el texto literal del artículo, con el nivel de un tribunal exigente.<div style="margin-top:6px">${esc(q.why||"")}</div>` : q.src==="oficial" ? `<b class="of">Respuesta oficial</b>: plantilla publicada por el tribunal.`
     : q.dud ? `<b class="du">Respuesta propuesta y dudosa</b>: no había plantilla oficial y el texto del escaneo no es claro. Compruébala con la ley.`
     : `<b class="pr">Respuesta propuesta</b>: el tribunal no publicó plantilla (o no venía en el PDF); la respuesta es de Claude.`;
   let why="";
@@ -542,6 +544,7 @@ $("#bCal").addEventListener("click",()=>window.showCalendar&&window.showCalendar
 $("#bSim3940").addEventListener("click",()=>openBank("s3940"));
 $("#nEx3940").textContent=QS.filter(q=>inBank(q,"e3940")).length;
 $("#bHard").addEventListener("click",()=>{ $("#fbank").value="hard"; $("#fstat").value="pend"; $("#fart").checked=false; $("#ftopic").value="all"; $("#fexam").value="all"; buildQueue(); showTab("q"); });
+$("#bCE100").addEventListener("click",()=>{ $("#fbank").value="ce100"; $("#fstat").value="pend"; $("#fart").checked=false; $("#ftopic").value="all"; $("#fexam").value="all"; buildQueue(); showTab("q"); });
 $("#bHard2").addEventListener("click",()=>{ $("#fbank").value="hard2"; $("#fstat").value="pend"; $("#fart").checked=false; $("#ftopic").value="all"; $("#fexam").value="all"; buildQueue(); showTab("q"); });
 $("#center").addEventListener("click",e=>{
   const a=e.target.closest(".rank .art"); if(a) return openArt(a.dataset.law,a.dataset.id);
